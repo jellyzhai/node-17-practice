@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>jsonp</title>
+    <script>
+        function test(jsonpData) {
+            console.log(jsonpData);
+        }
+    </script>
+    <script src="http://127.0.0.1:3000?callback=test"></script>
+</head>
+<body>
+    <h1>当前页面需要使用不同服务器如：live server 打开, 然后查看控制台打印的数据</h1>
+
+
+</body>
+</html>
