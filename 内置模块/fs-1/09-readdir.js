@@ -12,7 +12,6 @@ fs.readdir(dirPath, (err, fileNameArr) => {
     const filePath = path.resolve(__dirname, `./public/${name}`)
 
     fs.stat(filePath, (err, file) => {
-        console.log('file: ', file.prototype);
       if (file.isFile()) {
         fs.rm(filePath, err => console.log(err));
       }
