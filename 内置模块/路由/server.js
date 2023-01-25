@@ -12,9 +12,9 @@ function start() {
         const urlObj = new URL(req.url, "http://127.0.0.1:3000");
 
         try {
-          router[urlObj.pathname](res);
+          router[urlObj.pathname](req, res);
         } catch (error) {
-          router["/404"](res);
+          router["/404"](req, res);
         }
       })
       .listen(3000, () => {

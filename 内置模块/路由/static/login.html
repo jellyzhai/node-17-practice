@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>login</title>
+  </head>
+
+  <body>
+    <h2>login</h2>
+
+    <div>
+      <div><input type="text" name="userName" id="userName"/></div>
+      <div><input type="password" name="password" id="password"/></div>
+      <div><button id="getLogin">get登录</button></div>
+      <div><button id="postLogin">post登录</button></div>
+    </div>
+
+    <script>
+        const userNameDom = document.querySelector('#userName')
+        const passwordDom = document.querySelector('#password')
+        const getLoginDom = document.querySelector('#getLogin')
+        const postLoginDom = document.querySelector('#postLogin')
+
+        getLoginDom.onclick = () => {
+            fetch(`/api/login?name=${userNameDom.value}&password=${passwordDom.value}`)
+            .then(res => {
+                console.log('fetch res:', res);
+                return res.json()
+            })
+            .then(data => {
+                console.log('fetch data:', data);
+            })
+        }
+
+        postLoginDom.onclick = () => {
+            fetch(`/api/login_post`, {
+                method: 'POST',
+                headers: {
+                    'content-type': 'application/json'
+                },
+                body: JSON.stringify({name: userNameDom.value, password: passwordDom.value })
+            })
+            .then(res => {
+                console.log('fetch post res:', res);
+                return res.json()
+            })
+            .then(data => {
+                console.log('fetch post data:', data);
+            })
+        }
+    </script>
+  </body>
+</html>

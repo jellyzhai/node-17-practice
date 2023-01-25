@@ -13,21 +13,21 @@ const handleResponse = (code, res, relativeUrl, header = defaultHeader) => {
 };
 
 const route = {
-  "/favicon.ico": (res) => {
+  "/favicon.ico": (req, res) => {
     handleResponse(200, res, "./static//favicon.ico", {
       "content-type": "image/x-icon",
     });
   },
-  "/": (res) => {
+  "/": (req, res) => {
     handleResponse(200, res, "./static/home.html");
   },
-  "/home": (res) => {
+  "/home": (req, res) => {
     handleResponse(200, res, "./static/home.html");
   },
-  "/login": (res) => {
+  "/login": (req, res) => {
     handleResponse(200, res, "./static/login.html");
   },
-  "/404": (res) => {
+  "/404": (req, res) => {
     handleResponse(404, res, "./static/404.html");
   },
 };
