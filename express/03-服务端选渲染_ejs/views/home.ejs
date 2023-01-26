@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>home</title>
+</head>
+<body>
+    home-页面
+    <%# 下面用来引用模板片段 %>
+    <%- include('./header.ejs', {showAD: true}) %>
+    <pre>
+        <% 1==1 ? 1 : 0%> - 里面写流程控制 if for
+        <%= '这里写<b>变量</b>' %>
+        <%- '<h3>这里渲染HTML</h3>' %>
+        <%# '这里写注释'  %>
+    </pre>
+    <ul>
+        <% for (let index = 0; index < list.length; index++) { %>
+            <li><%= list[index] %></li>
+        <% } %>
+    </ul>
+</body>
+</html>
