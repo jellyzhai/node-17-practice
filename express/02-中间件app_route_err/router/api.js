@@ -3,10 +3,9 @@ const express = require('express')
 const router = express.Router()
 
 const userApiRouter = require('./user.api')
+const loginApiRouter = require("./login.api");
 
-router.use('/login', (req, res) => {
-    res.send({name: 'jelly', password: '123123'})
-})
+router.use("/login", loginApiRouter);
 
 router.use("/user", userApiRouter);
 
