@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>用户注册</title>
+</head>
+
+<body>
+  <h1>用户注册</h1>
+
+  <div>
+    <div>用户名：<input type="text" id="username"></div>
+    <div>密码：<input type="password" id="password"></div>
+    <div>年龄：<input type="number" id="age"></div>
+    <div><button id="registry">注册</button></div>
+  </div>
+
+  <script>
+    const usernameDom = document.querySelector('#username')
+    const passwordDom = document.querySelector('#password')
+    const ageDom = document.querySelector('#age')
+    const registryDom = document.querySelector('#registry')
+
+    registryDom.onclick = () => {
+      fetch('/api/users/add', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify({
+          username: usernameDom.value,
+          password: passwordDom.value,
+          age: ageDom.value,
+        })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.ok === 1) {
+            location.href = '/users/list'
+          }
+        })
+    }
+  </script>
+</body>
+
+</html>

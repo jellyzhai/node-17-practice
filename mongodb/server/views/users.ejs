@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>用户列表</title>
+  <style>
+    table {
+      border-collapse: collapse;
+    }
+
+    caption {
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    th,
+    td {
+      padding: 10px;
+      border: 1px solid;
+    }
+  </style>
+</head>
+
+<body>
+  <table>
+    <caption>用户列表</caption>
+    <thead>
+      <th>id</th>
+      <th>用户名</th>
+      <th>密码</th>
+      <th>年龄</th>
+      <th>操作</th>
+    </thead>
+
+    <tbody>
+      <% for( let index=0; index < data.length; index++ ) { %>
+        <tr>
+          <td>
+            <%= data[index]._id %>
+          </td>
+          <td>
+            <%= data[index].username %>
+          </td>
+          <td>
+            <%# data[index].password %>
+              ******
+          </td>
+          <td>
+            <%= data[index].age %>
+          </td>
+          <td>
+            <button data-id="<%= data[index]._id %>" onclick="update(this)">更新(age+1)</button>
+            <button data-id="<%= data[index]._id %>" onclick="deleteFun(this)">删除</button>
+          </td>
+        </tr>
+        <% } %>
+
+          <% if (!data.length) { %>
+            <tr>
+              <td colspan="9">暂无数据</td>
+            </tr>
+            <% } %>
+    </tbody>
+    </div>
+  </table>
+  <div>
+    页数：<input type="number" value="<%= pageNum %>" min="1" placeholder="请输入查询的页数" id="pageNum"
+      onchange="pageNumChange(this)">
+    每页显示条数：<select id="limitCount" style="width: max-content;" onchange="limitCountChange(this)">
+      <option>请选择每页展示数量</option>
+
+      <% for( let index=0; index < limitCountArr.length; index++ ) { %>
+        <option value="<%= limitCountArr[index] %>" <%=(+limitCount === +limitCountArr[index]) ? 'selected' : '' %>>
+          <%=limitCountArr[index]%>
+        </option>
+      <% } %>
+
+    </select>
+
+    <%= limitCount %>
+      <script>
+        function update(btn) {
+          fetch(`/api/users/update/${btn.dataset.id}`, {
+            method: 'POST',
+          })
+            .then(res => res.json())
+            .then(data => {
+              if (data.ok) {
+                confirm('age update success')
+                location.reload()
+
+              } else {
+                confirm('age update failed')
+              }
+            })
+            .catch(() => {
+              confirm('age update failed')
+            })
+        }
+
+        function deleteFun(btn) {
+          fetch(`/api/users/delete/${btn.dataset.id}`, {
+            method: 'POST',
+          })
+            .then(res => res.json())
+            .then(data => {
+              if (data.ok) {
+                confirm('age delete success')
+                location.assign('/users/list')
+
+              } else {
+                confirm('age delete failed')
+              }
+            })
+            .catch(() => {
+              confirm('age delete failed')
+            })
+        }
+
+        function getUsersByPageNumLimitCount(pageNum, limitCount) {
+          fetch(`/users/list?pageNum=${pageNum}&limitCount=${limitCount}`)
+            .then(res => res.text())
+            .then(data => {
+              location.assign(`/users/list?pageNum=${pageNum}&limitCount=${limitCount}`)
+            })
+            .catch(() => {
+              confirm('接口获取失败')
+            })
+        }
+
+        function pageNumChange(limitCountDom) {
+          const limitCount = document.querySelector('#limitCount').value;
+          const pageNum = limitCountDom.value;
+
+          getUsersByPageNumLimitCount(pageNum, limitCount)
+        }
+
+        function limitCountChange(selectDom) {
+          const pageNum = document.querySelector('#pageNum').value;
+          const limitCount = selectDom.value;
+
+          getUsersByPageNumLimitCount(pageNum, limitCount)
+        }
+      </script>
+</body>
+
+</html>
