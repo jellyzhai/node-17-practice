@@ -2,27 +2,25 @@
 <html>
 
 <head>
-  <title>添加用户</title>
+  <title>登录</title>
 </head>
 
 <body>
-  <h1>添加用户</h1>
+  <h1>登录</h1>
 
   <div>
     <div>用户名：<input type="text" id="username"></div>
     <div>密码：<input type="password" id="password"></div>
-    <div>年龄：<input type="number" id="age"></div>
-    <div><button id="add">添加用户</button></div>
+    <div><button id="login">登录</button></div>
   </div>
 
   <script>
     const usernameDom = document.querySelector('#username')
     const passwordDom = document.querySelector('#password')
-    const ageDom = document.querySelector('#age')
-    const addUserDom = document.querySelector('#add')
+    const loginDom = document.querySelector('#login')
 
-    addUserDom.onclick = () => {
-      fetch('/api/user', {
+    loginDom.onclick = () => {
+      fetch('/api/login', {
         method: 'POST',
         headers: {
           'content-type': 'application/json'
@@ -30,13 +28,14 @@
         body: JSON.stringify({
           username: usernameDom.value,
           password: passwordDom.value,
-          age: ageDom.value,
         })
       })
         .then(res => res.json())
         .then(data => {
           if (data.ok === 1) {
-            location.assign('/users')
+            location.assign('/add')
+          } else {
+            confirm('用户名或密码不存在')
           }
         })
     }

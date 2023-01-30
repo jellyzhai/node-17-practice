@@ -1,3 +1,4 @@
+const UserModel = require("../model/UserModel");
 const UserService = require("../services/userService");
 
 const UserController = {
@@ -10,7 +11,7 @@ const UserController = {
       })
       .catch(() => res.send({ ok: 0 }));
   },
-  get: (req, res) => {
+  getUserPage: (req, res) => {
     const limitCountArr = [Infinity, 2, 4, 6];
     let { pageNum, limitCount } = req.query;
 
@@ -37,6 +38,20 @@ const UserController = {
       })
       .catch(() => res.send({ ok: 0 }));
   },
+  loginPage: (req, res) => {
+    res.render("login");
+  },
+  login: async (req, res) => {
+    const {username, password} = req.body;
+
+    const userInfo = await UserModel.findOne({ username, password });
+
+    if (userInfo) {
+        res.send({ok: 1})
+    } else {
+        res.send({ok: 0})
+    }
+},
 };
 
 module.exports = UserController;
