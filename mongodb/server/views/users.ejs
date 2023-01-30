@@ -66,14 +66,16 @@
     </div>
   </table>
   <div>
-    页数：<input type="number" value="<%= pageNum %>" min="1" placeholder="请输入查询的页数" id="pageNum"
-      onchange="pageNumChange(this)">
+    页数：<input type="number" style="width: 50px" min="1" placeholder="请输入查询的页数" value="<%= pageNum %>"
+      <%=String(limitCount)==='Infinity' ? 'disabled' : '' %>
+    id="pageNum" onchange="pageNumChange(this)">
     每页显示条数：<select id="limitCount" style="width: max-content;" onchange="limitCountChange(this)">
-      <option>请选择每页展示数量</option>
+      <option disabled>请选择每页展示数量</option>
 
       <% for( let index=0; index < limitCountArr.length; index++ ) { %>
-        <option value="<%= limitCountArr[index] %>" <%=(+limitCount===+limitCountArr[index]) ? 'selected' : '' %>>
-          <%=limitCountArr[index]%>
+        <option value="<%= limitCountArr[index] %>" <%=(+limitCount===+limitCountArr[index]) ? 'selected' : '' %>
+          <%= (+pageNum !==1 && String(limitCountArr[index])==='Infinity' ) ? 'disabled' : '' %> >
+            <%=limitCountArr[index]%>
         </option>
         <% } %>
 
@@ -111,7 +113,7 @@
           .then(data => {
             if (data.ok) {
               confirm(`${username} 删除成功。`)
-              location.assign('/users/list')
+              location.assign('/users')
 
             } else {
               confirm(`${username} 删除失败。`)
@@ -123,26 +125,41 @@
       }
 
       function getUsersByPageNumLimitCount(pageNum, limitCount) {
-        fetch(`/users/list?pageNum=${pageNum}&limitCount=${limitCount}`)
+        fetch(`/users?pageNum=${pageNum}&limitCount=${limitCount}`)
           .then(res => res.text())
           .then(data => {
-            location.assign(`/users/list?pageNum=${pageNum}&limitCount=${limitCount}`)
+            location.assign(`/users?pageNum=${pageNum}&limitCount=${limitCount}`)
           })
           .catch(() => {
             confirm('接口获取失败')
           })
       }
 
-      function pageNumChange(limitCountDom) {
-        const limitCount = document.querySelector('#limitCount').value;
-        const pageNum = limitCountDom.value;
+      function pageNumChange(pageNumDom) {
+        const pageNum = pageNumDom.value;
+        const selectDom = document.querySelector('#limitCount');
+        const limitCount = selectDom.value;
+
+        if (pageNum !== 1) {
+          selectDom.querySelectorAll('option').forEach(ele => {
+            if (ele.textContent === 'Infinity') {
+              ele.setAttribute('disabled', true)
+            } else {
+              ele.removeAttribute('disabled')
+            }
+          })
+        } else {
+          selectDom.querySelectorAll('option').forEach(ele => {
+            ele.removeAttribute('disabled')
+          })
+        }
 
         getUsersByPageNumLimitCount(pageNum, limitCount)
       }
 
       function limitCountChange(selectDom) {
-        const pageNum = document.querySelector('#pageNum').value;
         const limitCount = selectDom.value;
+        const pageNum = document.querySelector('#pageNum').value;
 
         getUsersByPageNumLimitCount(pageNum, limitCount)
       }
