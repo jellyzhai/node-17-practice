@@ -8,7 +8,6 @@ router.get("/list", (req, res) => {
   let { pageNum, limitCount } = req.query;
   pageNum = pageNum || 1;
   limitCount = limitCount || Infinity;
-  console.log(limitCount);
 
   UserModel.find({}, ["id", "username", "age"])
     .skip((pageNum - 1) * limitCount)
