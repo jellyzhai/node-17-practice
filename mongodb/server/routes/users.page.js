@@ -3,7 +3,7 @@ const UserModel = require("../model/UserModel");
 var router = express.Router();
 
 /* GET users listing. */
-router.get("/list", (req, res) => {
+router.get("/", (req, res) => {
   const limitCountArr = [Infinity, 2, 4, 6];
   let { pageNum, limitCount } = req.query;
   pageNum = pageNum || 1;

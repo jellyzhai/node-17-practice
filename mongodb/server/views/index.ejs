@@ -22,7 +22,7 @@
     const registryDom = document.querySelector('#registry')
 
     registryDom.onclick = () => {
-      fetch('/api/users/add', {
+      fetch('/api/user', {
         method: 'POST',
         headers: {
           'content-type': 'application/json'
@@ -36,7 +36,7 @@
         .then(res => res.json())
         .then(data => {
           if (data.ok === 1) {
-            location.href = '/users/list'
+            location.href = '/users'
           }
         })
     }

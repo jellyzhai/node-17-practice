@@ -49,8 +49,10 @@
             <%= data[index].age %>
           </td>
           <td>
-            <button data-id="<%= data[index]._id %>" onclick="update(this)">更新(age+1)</button>
-            <button data-id="<%= data[index]._id %>" onclick="deleteFun(this)">删除</button>
+            <button data-id="<%= data[index]._id %>" data-username="<%= data[index].username %>"
+              onclick="update(this)">更新(age+1)</button>
+            <button data-id="<%= data[index]._id %>" data-username="<%= data[index].username %>"
+              onclick="deleteFun(this)">删除</button>
           </td>
         </tr>
         <% } %>
@@ -70,77 +72,81 @@
       <option>请选择每页展示数量</option>
 
       <% for( let index=0; index < limitCountArr.length; index++ ) { %>
-        <option value="<%= limitCountArr[index] %>" <%=(+limitCount === +limitCountArr[index]) ? 'selected' : '' %>>
+        <option value="<%= limitCountArr[index] %>" <%=(+limitCount===+limitCountArr[index]) ? 'selected' : '' %>>
           <%=limitCountArr[index]%>
         </option>
-      <% } %>
+        <% } %>
 
     </select>
 
-      <script>
-        function update(btn) {
-          fetch(`/api/users/update/${btn.dataset.id}`, {
-            method: 'POST',
+    <script>
+      function update(btn) {
+        const username = btn.dataset.username
+
+        fetch(`/api/user/${btn.dataset.id}`, {
+          method: 'PUT',
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (data.ok) {
+              confirm(`${username} 更新成功。`)
+              location.reload()
+
+            } else {
+              confirm(`${username} 更新失败。`)
+            }
           })
-            .then(res => res.json())
-            .then(data => {
-              if (data.ok) {
-                confirm('age update success')
-                location.reload()
-
-              } else {
-                confirm('age update failed')
-              }
-            })
-            .catch(() => {
-              confirm('age update failed')
-            })
-        }
-
-        function deleteFun(btn) {
-          fetch(`/api/users/delete/${btn.dataset.id}`, {
-            method: 'POST',
+          .catch(() => {
+            confirm(`${username} 更新失败。`)
           })
-            .then(res => res.json())
-            .then(data => {
-              if (data.ok) {
-                confirm('age delete success')
-                location.assign('/users/list')
+      }
 
-              } else {
-                confirm('age delete failed')
-              }
-            })
-            .catch(() => {
-              confirm('age delete failed')
-            })
-        }
+      function deleteFun(btn) {
+        const username = btn.dataset.username
 
-        function getUsersByPageNumLimitCount(pageNum, limitCount) {
-          fetch(`/users/list?pageNum=${pageNum}&limitCount=${limitCount}`)
-            .then(res => res.text())
-            .then(data => {
-              location.assign(`/users/list?pageNum=${pageNum}&limitCount=${limitCount}`)
-            })
-            .catch(() => {
-              confirm('接口获取失败')
-            })
-        }
+        fetch(`/api/user/${btn.dataset.id}`, {
+          method: 'DELETE',
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (data.ok) {
+              confirm(`${username} 删除成功。`)
+              location.assign('/users/list')
 
-        function pageNumChange(limitCountDom) {
-          const limitCount = document.querySelector('#limitCount').value;
-          const pageNum = limitCountDom.value;
+            } else {
+              confirm(`${username} 删除失败。`)
+            }
+          })
+          .catch(() => {
+            confirm(`${username} 删除失败。`)
+          })
+      }
 
-          getUsersByPageNumLimitCount(pageNum, limitCount)
-        }
+      function getUsersByPageNumLimitCount(pageNum, limitCount) {
+        fetch(`/users/list?pageNum=${pageNum}&limitCount=${limitCount}`)
+          .then(res => res.text())
+          .then(data => {
+            location.assign(`/users/list?pageNum=${pageNum}&limitCount=${limitCount}`)
+          })
+          .catch(() => {
+            confirm('接口获取失败')
+          })
+      }
 
-        function limitCountChange(selectDom) {
-          const pageNum = document.querySelector('#pageNum').value;
-          const limitCount = selectDom.value;
+      function pageNumChange(limitCountDom) {
+        const limitCount = document.querySelector('#limitCount').value;
+        const pageNum = limitCountDom.value;
 
-          getUsersByPageNumLimitCount(pageNum, limitCount)
-        }
-      </script>
+        getUsersByPageNumLimitCount(pageNum, limitCount)
+      }
+
+      function limitCountChange(selectDom) {
+        const pageNum = document.querySelector('#pageNum').value;
+        const limitCount = selectDom.value;
+
+        getUsersByPageNumLimitCount(pageNum, limitCount)
+      }
+    </script>
 </body>
 
 </html>
