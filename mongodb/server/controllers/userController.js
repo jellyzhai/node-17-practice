@@ -42,16 +42,19 @@ const UserController = {
     res.render("login");
   },
   login: async (req, res) => {
-    const {username, password} = req.body;
+    const { username, password } = req.body;
 
     const userInfo = await UserModel.findOne({ username, password });
 
     if (userInfo) {
-        res.send({ok: 1})
+
+      // 不同用户登陆时， res.session 是不同的对象，会根据客户端带来的cookie 自动匹配 对应 session
+      req.session.user = userInfo
+      res.send({ ok: 1 })
     } else {
-        res.send({ok: 0})
+      res.send({ ok: 0 })
     }
-},
+  },
 };
 
 module.exports = UserController;

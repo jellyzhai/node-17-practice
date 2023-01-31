@@ -94,6 +94,8 @@
               confirm(`${username} 更新成功。`)
               location.reload()
 
+            } else if (data.ok === 401) {
+              location.assign('/login')
             } else {
               confirm(`${username} 更新失败。`)
             }
@@ -115,6 +117,8 @@
               confirm(`${username} 删除成功。`)
               location.assign('/users')
 
+            } else if (data.ok === 401) {
+              location.assign('/login')
             } else {
               confirm(`${username} 删除失败。`)
             }
@@ -128,6 +132,10 @@
         fetch(`/users?pageNum=${pageNum}&limitCount=${limitCount}`)
           .then(res => res.text())
           .then(data => {
+            if (data.ok === 401) {
+              location.assign('/login')
+              return
+            }
             location.assign(`/users?pageNum=${pageNum}&limitCount=${limitCount}`)
           })
           .catch(() => {

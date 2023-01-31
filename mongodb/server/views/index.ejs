@@ -37,6 +37,8 @@
         .then(data => {
           if (data.ok === 1) {
             location.assign('/users')
+          } else if (data.ok === 401) {
+            location.assign('/login')
           }
         })
     }
