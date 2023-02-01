@@ -1,0 +1,16 @@
+<button id="logout">退出</button>
+
+<script>
+    const logoutDom = document.querySelector('#logout')
+
+    logoutDom.onclick = () => {
+        fetch('/api/logout')
+        .then(res => res.json())
+        .then(data => {
+            if (data.ok === 1) {
+                confirm('服务端 session 无效(已过期或已销毁)')
+                location.assign('/login')
+            }
+        })
+    }
+</script>

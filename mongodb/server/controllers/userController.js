@@ -55,6 +55,12 @@ const UserController = {
       res.send({ ok: 0 })
     }
   },
+  logout: (req, res) => {
+    // 会把手动添加的数据，从数据库中删除
+    req.session.destroy(() => {
+      res.send({ok: 1})
+    })
+  }
 };
 
 module.exports = UserController;
