@@ -10,8 +10,9 @@ const session = require('express-session')
 const MongoStore = require('connect-mongo')
 
 var loginPageRouter = require("./routes/login.page");
+var addUserPageRouter = require("./routes/index");
 var usersRouter = require('./routes/users');
-const JWT = require('./utils/jwt');
+const userPageRoute = require("./routes/users.page");
 
 var app = express();
 
@@ -61,32 +62,28 @@ app.use(
 
 // 设置 session 校验
 app.use((req, res, next) => {
-  // jsonwebtoken 验证方式，适用于前后端分离项目，后端渲染的页面url 只能在中间件中过滤掉，
-  // 因为浏览器访问的页面url 无法在header中假如token
-  if (
-    req.url == "/" ||
-    req.url == "/favicon.ico" ||
-    req.url == "/login" ||
-    req.url == "/api/login"
-  ) {
+  if (req.url == "/" || req.url == "/login" || req.url == "/api/login") {
     next();
     return;
   }
 
-  const tokenStr = req.header("authorization");
-  const tokenObj = JWT.verify(tokenStr)
-
-  if (tokenObj) {
-    const token = JWT.sign({ _id: tokenObj._id, username: tokenObj.username }, '1h');
-
-    res.setHeader('authorization', token)
-    next();
+  if (req.session.user) {
+    // 登陆后，每次收到请求时，都更新一次 session 信息；改用 session 的 rolling 配置
+    // req.session.infoUpdating = Date.now()
+    next()
   } else {
-    res.status(401).send({ ok: 401 });
+    // 当客户端请求 api 接口时，需要返回 json，而不是在后端重定向，返回 html
+    if (req.url.startsWith('/api')) {
+      res.status(401).send({ok: 401})
+    } else {
+      res.redirect("/login");
+    }
   }
 })
 
 app.use("/login", loginPageRouter);
+app.use("/add", addUserPageRouter);
+app.use("/users", userPageRoute);
 app.use('/api', usersRouter);
 app.use("/", (req, res) => {
   res.redirect("/login");

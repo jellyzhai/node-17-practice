@@ -1,45 +1,43 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <title>登录</title>
+    <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
+  </head>
 
-<head>
-  <title>登录</title>
-</head>
+  <body>
+    <h1>登录</h1>
 
-<body>
-  <h1>登录</h1>
+    <div>
+      <div>用户名：<input type="text" id="username" /></div>
+      <div>密码：<input type="password" id="password" /></div>
+      <div><button id="login">登录</button></div>
+    </div>
 
-  <div>
-    <div>用户名：<input type="text" id="username"></div>
-    <div>密码：<input type="password" id="password"></div>
-    <div><button id="login">登录</button></div>
-  </div>
+    <script>
+      const usernameDom = document.querySelector("#username");
+      const passwordDom = document.querySelector("#password");
+      const loginDom = document.querySelector("#login");
 
-  <script>
-    const usernameDom = document.querySelector('#username')
-    const passwordDom = document.querySelector('#password')
-    const loginDom = document.querySelector('#login')
-
-    loginDom.onclick = () => {
-      fetch('/api/login', {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json'
-        },
-        body: JSON.stringify({
-          username: usernameDom.value,
-          password: passwordDom.value,
-        })
-      })
-        .then(res => res.json())
-        .then(data => {
-          if (data.ok === 1) {
-            location.assign('/add')
-          } else {
-            confirm('用户名或密码不存在')
-          }
-        })
-    }
-  </script>
-</body>
-
+      loginDom.onclick = () => {
+        axios
+          .post("/api/login", {
+            username: usernameDom.value,
+            password: passwordDom.value,
+          })
+          .then((res) => {
+            if (res.data.ok === 1) {
+              localStorage.setItem('authorization', res.headers.authorization)
+              location.assign("/add_user.html");
+            } else {
+              alert("用户名或密码不存在");
+            }
+          })
+          .catch(err => {
+            alert('登录失败')
+            console.log(err);
+          });
+      };
+    </script>
+  </body>
 </html>

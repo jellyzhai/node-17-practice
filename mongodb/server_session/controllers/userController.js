@@ -1,6 +1,5 @@
 const UserModel = require("../model/UserModel");
 const UserService = require("../services/userService");
-const JWT = require("../utils/jwt");
 
 const UserController = {
   add: (req, res) => {
@@ -12,7 +11,8 @@ const UserController = {
       })
       .catch(() => res.send({ ok: 0 }));
   },
-  get: (req, res) => {
+  getUserPage: (req, res) => {
+    const limitCountArr = [Infinity, 2, 4, 6];
     let { pageNum, limitCount } = req.query;
 
     pageNum = pageNum || 1;
@@ -20,9 +20,9 @@ const UserController = {
 
     UserService.get(pageNum, limitCount)
       .then((data) => {
-        res.send(data)
+        res.render("users", { data, pageNum, limitCount, limitCountArr });
       })
-      .catch(() => res.send([]));
+      .catch(() => res.send("获取用户列表失败"));
   },
   update: (req, res) => {
     UserService.update(req)
@@ -47,13 +47,19 @@ const UserController = {
     const userInfo = await UserModel.findOne({ username, password });
 
     if (userInfo) {
-      const token = JWT.sign({ _id: userInfo._id,username: userInfo.username }, "1h");
 
-      res.header("authorization", token);
+      // 不同用户登陆时， res.session 是不同的对象，会根据客户端带来的cookie 自动匹配 对应 session
+      req.session.user = userInfo
       res.send({ ok: 1 })
     } else {
       res.send({ ok: 0 })
     }
+  },
+  logout: (req, res) => {
+    // 会把手动添加的数据，从数据库中删除
+    req.session.destroy(() => {
+      res.send({ok: 1})
+    })
   }
 };
 
