@@ -1,12 +1,12 @@
 const UserModel = require("../model/UserModel");
 
 const UserService = {
-  add: (username, password, age) => {
+  add: (username, password, age, avatar) => {
     // UserModel 集合的方法 create find update delete, 返回promise
-    return UserModel.create({ username, password, age });
+    return UserModel.create({ username, password, age, avatar });
   },
   get: (pageNum, limitCount) => {
-    return UserModel.find({}, ["id", "username", "age", "password"])
+    return UserModel.find({}, ["id", "username", "age", "password", "avatar"])
       .skip((pageNum - 1) * limitCount)
       .limit(limitCount)
       .sort({ age: 1 });

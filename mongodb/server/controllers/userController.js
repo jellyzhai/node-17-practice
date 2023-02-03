@@ -1,12 +1,16 @@
+const fs = require("fs");
+const path = require("path");
 const UserModel = require("../model/UserModel");
 const UserService = require("../services/userService");
 const JWT = require("../utils/jwt");
 
 const UserController = {
   add: (req, res) => {
+    let { filename } = req.file || {};
+    const avatar = filename ? `/uploads/${filename}` : "/images/default.jpg";
     const { username, password, age } = req.body;
 
-    UserService.add(username, password, age)
+    UserService.add(username, password, age, avatar)
       .then((data) => {
         res.send({ ok: 1 });
       })
@@ -32,6 +36,14 @@ const UserController = {
       .catch(() => res.send({ ok: 0 }));
   },
   delete: (req, res) => {
+    const { avatar } = req.query;
+
+    if (avatar.includes('uploads')) {
+      fs.rm(path.resolve(__dirname, "../public/" + avatar), (err) => {
+        console.log(err);
+      });
+    }
+
     UserService.delete(req)
       .then((data) => {
         res.send({ ok: 1 });

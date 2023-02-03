@@ -21,33 +21,37 @@
     </style>
     <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
     <script>
-        axios.interceptors.request.use(function (config) {
+        axios.interceptors.request.use(
+            function (config) {
+                const token = localStorage.getItem("authorization");
 
-            const token = localStorage.getItem('authorization')
+                if (token) {
+                    config.headers.authorization = token;
+                }
 
-            if (token) {
-                config.headers.authorization = token;
+                return config;
+            },
+            function (error) {
+                return Promise.reject(error);
             }
+        );
 
-            return config;
-        }, function (error) {
+        axios.interceptors.response.use(
+            function (res) {
+                const { authorization } = res.headers;
 
-            return Promise.reject(error);
-        });
+                localStorage.setItem("authorization", authorization);
 
-        axios.interceptors.response.use(function (res) {
-            const { authorization } = res.headers;
-
-            localStorage.setItem('authorization', authorization)
-
-            return res;
-        }, function (error) {
-            if (+error.response.status === 401) {
-                alert("登录状态已失效，请重新登录");
-                location.assign("/login");
+                return res;
+            },
+            function (error) {
+                if (+error.response.status === 401) {
+                    alert("登录状态已失效，请重新登录");
+                    location.assign("/login");
+                }
+                return Promise.reject(error);
             }
-            return Promise.reject(error);
-        });
+        );
     </script>
 </head>
 
@@ -56,176 +60,184 @@
         <button id="logout">退出</button>
 
         <script>
-            const logoutDom = document.querySelector('#logout')
+            const logoutDom = document.querySelector("#logout");
 
             logoutDom.onclick = () => {
-                localStorage.removeItem('authorization')
-                alert('退出成功！')
-                location.assign('/login')
-            }
+                localStorage.removeItem("authorization");
+                alert("退出成功！");
+                location.assign("/login");
+            };
         </script>
     </h2>
 
     <table>
-        <caption>用户列表</caption>
+        <caption>
+            用户列表
+        </caption>
         <thead>
             <th>id</th>
             <th>用户名</th>
             <th>密码</th>
             <th>年龄</th>
+            <th>头像</th>
             <th>操作</th>
         </thead>
 
-        <tbody id="tbodyDom">
-
-        </tbody>
-
+        <tbody id="tbodyDom"></tbody>
     </table>
 
     <div id="footerTools">
         页数：
-        <input type="number" style="width: 50px" min="1" placeholder="请输入查询的页数" value="1"
-            disabled id="pageNum" onchange="pageNumChange(this)">
+        <input type="number" style="width: 50px" min="1" placeholder="请输入查询的页数" value="1" disabled id="pageNum"
+            onchange="pageNumChange(this)" />
 
         每页显示条数：
-        <select id="limitCount" style="width: max-content;" onchange="limitCountChange(this)">
+        <select id="limitCount" style="width: max-content" onchange="limitCountChange(this)">
             <option disabled>请选择每页展示数量</option>
-            <option value="Infinity" selected >Infinity</option>
-            <option value="2" >2</option>
-            <option value="4" >4</option>
-            <option value="6" >6</option>
+            <option value="Infinity" selected>Infinity</option>
+            <option value="2">2</option>
+            <option value="4">4</option>
+            <option value="6">6</option>
         </select>
     </div>
 
+    <script>
+        let pageNum = 1,
+            limitCount = Infinity;
 
-        <script>
-            let pageNum = 1, limitCount = Infinity;
+        const tbodyDom = document.querySelector("#tbodyDom");
+        const footerTools = document.querySelector("#footerTools");
 
-            const tbodyDom = document.querySelector('#tbodyDom')
-            const footerTools = document.querySelector('#footerTools')
+        getUsers(pageNum, limitCount);
 
-            getUsers(pageNum, limitCount)
+        function getUsers(pageNum, limitCount) {
+            tbodyDom.innerHTML = `<tr> <td colspan="9">加载中...</td> </tr > `;
 
-            function getUsers(pageNum, limitCount) {
-                tbodyDom.innerHTML = `<tr> <td colspan="9">加载中...</td> </tr > `;
-
-                axios.get(`/api/user?pageNum=${pageNum}&limitCount=${limitCount}`)
-                .then(res => {
+            axios
+                .get(`/api/user?pageNum=${pageNum}&limitCount=${limitCount}`)
+                .then((res) => {
                     const data = res.data;
 
-                    let fragment = data.map(item => `
+                    let fragment = data
+                        .map(
+                            (item) => `
                         <tr>
                             <td>${item._id}</td>
                             <td>${item.username}</td>
                             <td>${item.password}</td>
                             <td>${item.age}</td>
+                            <td><img src='${item.avatar}' width='60px' /></td>
                             <td>
                                 <button data-id="${item._id}" data-username="${item.username}"
                                     onclick="update(this)">更新(age+1)</button>
-                                <button data-id="${item._id}" data-username="${item.username}"
+                                <button data-id="${item._id}" data-avatar="${item.avatar}" data-username="${item.username}"
                                     onclick="deleteFun(this)">删除</button>
                             </td>
                         </tr>
-                    `).join('')
+                    `
+                        )
+                        .join("");
 
                     if (!data.length) {
-                        fragment = `<tr> <td colspan="9">暂无数据</td> </tr > `
+                        fragment = `<tr> <td colspan="9">暂无数据</td> </tr > `;
                     }
 
                     tbodyDom.innerHTML = fragment;
                 })
-                .catch(err => {
-                    alert('获取用户列表失败')
-                    tbodyDom.innerHTML = `<tr> <td colspan="9">暂无数据</td> </tr > `
+                .catch((err) => {
+                    alert("获取用户列表失败");
+                    tbodyDom.innerHTML = `<tr> <td colspan="9">暂无数据</td> </tr > `;
                     console.log(err);
+                });
+        }
+
+        function update(btn) {
+            const username = btn.dataset.username;
+
+            const confirmUpdate = confirm(`确认更新 ${username}？`);
+
+            if (!confirmUpdate) {
+                return;
+            }
+
+            axios
+                .put(`/api/user/${btn.dataset.id}`)
+                .then((res) => {
+                    if (res.data.ok) {
+                        alert(`${username} 更新成功。`);
+                        getUsers(pageNum, limitCount);
+                    } else {
+                        return Promise.reject(res.data);
+                    }
                 })
+                .catch(() => {
+                    alert(`${username} 更新失败。`);
+                });
+        }
+
+        function deleteFun(btn) {
+            const username = btn.dataset.username;
+            const avatar = btn.dataset.avatar;
+
+            const confirmDelete = confirm(`确认删除 ${username}？`);
+
+            if (!confirmDelete) {
+                return;
             }
 
-            function update(btn) {
-                const username = btn.dataset.username
+            axios
+                .delete(`/api/user/${btn.dataset.id}?avatar=${avatar}`)
+                .then((res) => {
+                    if (res.data.ok) {
+                        alert(`${username} 删除成功。`);
+                        getUsers(pageNum, limitCount);
+                    } else {
+                        return Promise.reject(res.data);
+                    }
+                })
+                .catch(() => {
+                    alert(`${username} 删除失败。`);
+                });
+        }
 
-                const confirmUpdate = confirm(`确认更新 ${username}？`)
+        function pageNumChange(pageNumDom) {
+            pageNum = pageNumDom.value;
+            const selectDom = document.querySelector("#limitCount");
+            limitCount = selectDom.value;
 
-                if (!confirmUpdate) {
-                    return;
-                }
-
-                axios.put(`/api/user/${btn.dataset.id}`)
-                    .then(res => {
-                        if (res.data.ok) {
-                            alert(`${username} 更新成功。`)
-                            getUsers(pageNum, limitCount)
-                        } else {
-                            return Promise.reject(res.data)
-                        }
-                    })
-                    .catch(() => {
-                        alert(`${username} 更新失败。`)
-                    })
+            if (+pageNum !== 1) {
+                selectDom.querySelectorAll("option").forEach((ele) => {
+                    if (ele.textContent === "Infinity") {
+                        ele.setAttribute("disabled", true);
+                    } else {
+                        ele.removeAttribute("disabled");
+                    }
+                });
+            } else {
+                selectDom.querySelectorAll("option").forEach((ele) => {
+                    if (ele.textContent === "Infinity") {
+                        ele.removeAttribute("disabled");
+                    }
+                });
             }
 
-            function deleteFun(btn) {
-                const username = btn.dataset.username
+            getUsers(pageNum, limitCount);
+        }
 
-                const confirmDelete = confirm(`确认删除 ${username}？`)
+        function limitCountChange(selectDom) {
+            limitCount = selectDom.value;
+            const pageDom = document.querySelector("#pageNum");
+            pageNum = pageDom.value;
 
-                if (!confirmDelete) {
-                    return;
-                }
-
-
-                axios.delete(`/api/user/${btn.dataset.id}`)
-                    .then(res => {
-                        if (res.data.ok) {
-                            alert(`${username} 删除成功。`)
-                            getUsers(pageNum, limitCount)
-                        } else {
-                            return Promise.reject(res.data)
-                        }
-                    })
-                    .catch(() => {
-                        alert(`${username} 删除失败。`)
-                    })
+            if (+limitCount !== Infinity) {
+                pageDom.removeAttribute("disabled");
+            } else {
+                pageDom.setAttribute("disabled", true);
             }
 
-            function pageNumChange(pageNumDom) {
-                pageNum = pageNumDom.value;
-                const selectDom = document.querySelector('#limitCount');
-                limitCount = selectDom.value;
-
-                if (+pageNum !== 1) {
-                    selectDom.querySelectorAll('option').forEach(ele => {
-                        if (ele.textContent === 'Infinity') {
-                            ele.setAttribute('disabled', true)
-                        } else {
-                            ele.removeAttribute('disabled')
-                        }
-                    })
-                } else {
-                    selectDom.querySelectorAll('option').forEach(ele => {
-                        if (ele.textContent === 'Infinity') {
-                            ele.removeAttribute('disabled')
-                        }
-                    })
-                }
-
-                getUsers(pageNum, limitCount)
-            }
-
-            function limitCountChange(selectDom) {
-                limitCount = selectDom.value;
-                const pageDom = document.querySelector('#pageNum');
-                pageNum = pageDom.value;
-
-                if (+limitCount !== Infinity) {
-                    pageDom.removeAttribute('disabled')
-                } else {
-                    pageDom.setAttribute('disabled',true)
-                }
-
-                getUsers(pageNum, limitCount)
-            }
-        </script>
+            getUsers(pageNum, limitCount);
+        }
+    </script>
 </body>
 
 </html>
