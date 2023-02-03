@@ -26,6 +26,37 @@ app.post('/cool-profile', cpUpload, function (req, res, next) {
   // req.body will contain the text fields, if there were any
 })
 */
+/**
+ *
+ * @api {post} /api/user 添加用户
+ * @apiName addUser
+ * @apiGroup userGroup
+ * @apiVersion  1.0.0
+ *
+ *
+ * @apiParam  {String} username 用户名
+ * @apiParam  {String} password 密码
+ * @apiParam  {Number} age 年龄
+ * @apiParam  {File} avatar 头像
+ *
+ * @apiSuccess (200) {Number} ok 1:成功，0：失败
+*
+* @apiParamExample  {multipart/form-data} Request-Example:
+* {
+  *     username : 'jelly'
+  *     password : '123123'
+  *     age : 18
+  *     avatar : File
+  * }
+  *
+ *
+ * @apiSuccessExample {type} Success-Response:
+ * {
+ *     ok : 1
+ * }
+ *
+ *
+ */
 // 上传的单个文件的名字 avatar 要跟 页面中，表单项 name 属性名一致
 router.post("/user", upload.single('avatar'), UserController.add);
 
@@ -33,6 +64,24 @@ router.get("/user", UserController.get);
 
 router.put("/user/:id", UserController.update);
 
+/**
+ *
+ * @api {delete} /api/user/:id 删除用户
+ * @apiName deleteUser
+ * @apiGroup userGroup
+ * @apiVersion  1.0.0
+ *
+ *
+ * @apiSuccess (200) {Number} ok 1:成功，0：失败
+ *
+ *
+ * @apiSuccessExample {type} Success-Response:
+ * {
+ *     ok : 1
+ * }
+ *
+ *
+ */
 router.delete("/user/:id", UserController.delete);
 
 router.post("/login", UserController.login);
