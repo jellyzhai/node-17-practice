@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>添加用户</title>
+    <title>注册用户</title>
     <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
     <script>
         axios.interceptors.request.use(
@@ -23,20 +23,7 @@
 </head>
 
 <body>
-    <h2>
-        <button id="logout">退出</button>
-
-        <script>
-            const logoutDom = document.querySelector('#logout')
-
-            logoutDom.onclick = () => {
-                localStorage.removeItem('authorization')
-                alert('退出成功！')
-                location.assign('/login')
-            }
-        </script>
-    </h2>
-    <h2>添加用户</h2>
+    <h2>注册用户</h2>
 
     <div>
         <form name="addUser">
@@ -46,7 +33,7 @@
             <div>头像：<input type="file" name="avatar" id="avatar" /></div>
         </form>
 
-        <div><button id="add">添加用户</button></div>
+        <div><button id="add">注册用户</button></div>
     </div>
 
     <script>
@@ -69,13 +56,14 @@
             // formData.append('avatar', avatarDom.files[0])
 
             axios
-                .post("/api/user", formData, {
+                .post("/api/registry", formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data'
                     }
                 })
                 .then((res) => {
                     if (res.data.ok === 1) {
+                        localStorage.setItem('authorization', res.headers.authorization)
                         location.assign("/user_list.html");
                     } else if (res.data.ok === 401) {
                         alert("登录状态已失效，请重新登录");
@@ -87,7 +75,7 @@
                         alert("登录状态已失效，请重新登录");
                         location.assign("/login");
                     } else {
-                        alert('添加用户失败')
+                        alert('注册用户失败')
                     }
                 });
         };

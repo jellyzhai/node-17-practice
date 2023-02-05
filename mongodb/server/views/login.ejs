@@ -11,7 +11,10 @@
     <div>
       <div>用户名：<input type="text" id="username" /></div>
       <div>密码：<input type="password" id="password" /></div>
-      <div><button id="login">登录</button></div>
+      <div>
+        <button id="login">登录</button>
+        <a href="/registry.html" target="_self">注册</a>
+      </div>
     </div>
 
     <script>
@@ -28,7 +31,7 @@
           .then((res) => {
             if (res.data.ok === 1) {
               localStorage.setItem('authorization', res.headers.authorization)
-              location.assign("/add_user.html");
+              location.assign("/user_list.html");
             } else {
               alert("用户名或密码不存在");
             }

@@ -66,6 +66,7 @@ app.use((req, res, next) => {
   if (
     req.url == "/" ||
     req.url == "/favicon.ico" ||
+    req.url == "/api/registry" ||
     req.url == "/login" ||
     req.url == "/api/login"
   ) {

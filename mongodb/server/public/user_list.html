@@ -145,8 +145,10 @@
                     tbodyDom.innerHTML = fragment;
                 })
                 .catch((err) => {
-                    alert("获取用户列表失败");
-                    tbodyDom.innerHTML = `<tr> <td colspan="9">暂无数据</td> </tr > `;
+                    if (+err.status !== 401) {
+                        alert("获取用户列表失败");
+                        tbodyDom.innerHTML = `<tr> <td colspan="9">暂无数据</td> </tr > `;
+                    }
                     console.log(err);
                 });
         }

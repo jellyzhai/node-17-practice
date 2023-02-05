@@ -5,6 +5,22 @@ const UserService = require("../services/userService");
 const JWT = require("../utils/jwt");
 
 const UserController = {
+  registry: (req, res) => {
+    let { filename } = req.file || {};
+    const avatar = filename ? `/uploads/${filename}` : "/images/default.jpg";
+    const { username, password, age } = req.body;
+
+    console.log("req.body: ", req.body);
+
+    UserService.add(username, password, age, avatar)
+      .then((data) => {
+        const token = JWT.sign({ password, username }, "1h");
+
+        res.header("authorization", token);
+        res.send({ ok: 1 });
+      })
+      .catch(() => res.send({ ok: 0 }));
+  },
   add: (req, res) => {
     let { filename } = req.file || {};
     const avatar = filename ? `/uploads/${filename}` : "/images/default.jpg";
@@ -24,7 +40,7 @@ const UserController = {
 
     UserService.get(pageNum, limitCount)
       .then((data) => {
-        res.send(data)
+        res.send(data);
       })
       .catch(() => res.send([]));
   },
@@ -38,7 +54,7 @@ const UserController = {
   delete: (req, res) => {
     const { avatar } = req.query;
 
-    if (avatar.includes('uploads')) {
+    if (avatar.includes("uploads")) {
       fs.rm(path.resolve(__dirname, "../public/" + avatar), (err) => {
         console.log(err);
       });
@@ -59,14 +75,14 @@ const UserController = {
     const userInfo = await UserModel.findOne({ username, password });
 
     if (userInfo) {
-      const token = JWT.sign({ _id: userInfo._id,username: userInfo.username }, "1h");
+      const token = JWT.sign({ password, username: userInfo.username }, "1h");
 
       res.header("authorization", token);
-      res.send({ ok: 1 })
+      res.send({ ok: 1 });
     } else {
-      res.send({ ok: 0 })
+      res.send({ ok: 0 });
     }
-  }
+  },
 };
 
 module.exports = UserController;

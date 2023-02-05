@@ -86,4 +86,6 @@ router.delete("/user/:id", UserController.delete);
 
 router.post("/login", UserController.login);
 
+router.post("/registry", upload.single("avatar"), UserController.registry);
+
 module.exports = router;
